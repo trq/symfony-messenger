@@ -44,7 +44,7 @@ final class SqsTransport implements TransportInterface
             'MessageAttributes' => [
                 'Headers' => new MessageAttributeValue([
                     'DataType' => 'String',
-                    'StringValue' => json_encode($headers),
+                    'StringValue' => $this->json_encode($headers),
                 ]),
             ],
             'MessageBody' => $encodedMessage['body'],
@@ -83,5 +83,17 @@ final class SqsTransport implements TransportInterface
     public function reject(Envelope $envelope): void
     {
         throw new Exception('Not implemented');
+    }
+    
+    private function json_encode($value, $options = 0, $depth = 512)
+    {
+        $json = \json_encode($value, $options, $depth);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \RuntimeException(
+                'json_encode error: ' . json_last_error_msg()
+            );
+        }
+
+        return $json;
     }
 }
